@@ -1,94 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom'
+import './App.css'
 
-// Individual Player Component
-const Player = ({ name, initialScore = 0, onScoreChange }) => {
-  const [score, setScore] = useState(initialScore);
+// Import local images
+import awsLogo from './assets/aws-logo.png'
+import wsLogo from './assets/ws-logo.png'
 
-  const handleScoreChange = (points) => {
-    const newScore = score + points;
-    setScore(newScore);
-    onScoreChange(name, newScore);
-  };
-
+const Header = ({ username }) => {
   return (
-    <div className="player-card bg-gray-100 p-4 rounded-lg shadow-md">
-      <h3 className="text-xl font-bold mb-2">{name}</h3>
-      <div className="score-controls flex items-center justify-between">
-        <span className="text-2xl font-semibold">Score: {score}</span>
-        <div className="score-buttons flex gap-2">
-          <button 
-            onClick={() => handleScoreChange(1)} 
-            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-          >
-            +1
-          </button>
-          <button 
-            onClick={() => handleScoreChange(2)} 
-            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-          >
-            +2
-          </button>
-          <button 
-            onClick={() => handleScoreChange(3)} 
-            className="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
-          >
-            +3
-          </button>
-          <button 
-            onClick={() => handleScoreChange(-1)} 
-            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-          >
-            -1
+    <div className="bg-blue-600 text-white">
+      <div className="container mx-auto px-4 flex justify-between items-center py-4">
+        {/* Left Side - Logos and Navigation */}
+        <div className="flex items-center space-x-6">
+          <img src={awsLogo} alt="AWS Logo" className="h-10 w-20 object-contain" />
+          <img src={wsLogo} alt="WorldSkills Logo" className="h-10 w-20 object-contain" />
+          <nav className="flex items-center space-x-4">
+            <Link to="/" className="hover:underline">Home</Link>
+            <Link to="/dashboard" className="hover:underline">Dashboard</Link>
+            <Link to="/leaderboard" className="hover:underline">Leaderboard</Link>
+            <Link to="/challenges" className="hover:underline">Challenges</Link>
+          </nav>
+        </div>
+
+        {/* Right Side - User Info */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{username || '<showuser>'}</span>
+          </div>
+          <button className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
+            Login
           </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-// Scoreboard Component
-const Scoreboard = () => {
-  const [players, setPlayers] = useState([]);
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 text-white py-4 px-6 flex justify-between items-center">
+      <div>
+        © WorldSkills Australia 2025
+      </div>
+    </footer>
+  )
+}
+
+const HomePage = () => {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">Welcome to WorldSkills</h1>
+      <p className="text-lg mb-4">
+        WorldSkills is a global platform dedicated to showcasing and developing 
+        skills across various domains. Our mission is to inspire young people 
+        to excel in their chosen fields and promote the importance of skills 
+        in personal and professional growth.
+      </p>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-blue-100 p-6 rounded-lg">
+          <h2 className="text-2xl font-semibold mb-3">Our Vision</h2>
+          <p>
+            To empower individuals through skills development and 
+            provide a platform for global recognition and opportunity.
+          </p>
+        </div>
+        <div className="bg-green-100 p-6 rounded-lg">
+          <h2 className="text-2xl font-semibold mb-3">What We Do</h2>
+          <p>
+            We organize competitions, provide training, and create 
+            networking opportunities for skilled professionals worldwide.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const DashboardPage = () => {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+      <p>Dashboard content coming soon...</p>
+    </div>
+  )
+}
+
+const ChallengesPage = () => {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">Challenges</h1>
+      <p>Challenges content coming soon...</p>
+    </div>
+  )
+}
+
+const Leaderboard = () => {
+  const [players, setPlayers] = useState([
+    { id: 1, name: 'John Doe', score: 150 },
+    { id: 2, name: 'Jane Smith', score: 200 },
+    { id: 3, name: 'Mike Johnson', score: 120 },
+    { id: 4, name: 'Sarah Williams', score: 180 }
+  ]);
+
   const [newPlayerName, setNewPlayerName] = useState('');
-  const [teamScores, setTeamScores] = useState({});
+
+  // Sort players by score in descending order
+  const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   const addPlayer = () => {
     if (newPlayerName.trim() && players.length < 64) {
       const newPlayer = {
         id: Date.now(),
-        name: newPlayerName.trim()
+        name: newPlayerName.trim(),
+        score: 0
       };
       setPlayers([...players, newPlayer]);
       setNewPlayerName('');
     }
   };
 
-  const handlePlayerScoreChange = (playerName, newScore) => {
-    setTeamScores(prev => ({
-      ...prev,
-      [playerName]: newScore
-    }));
+  const updatePlayerScore = (playerId, points) => {
+    setPlayers(players.map(player => 
+      player.id === playerId 
+        ? { ...player, score: Math.max(0, player.score + points) }
+        : player
+    ));
   };
 
-  const removePlayer = (playerToRemove) => {
-    setPlayers(players.filter(player => player.name !== playerToRemove));
-    
-    // Remove the score for the deleted player
-    const updatedScores = {...teamScores};
-    delete updatedScores[playerToRemove];
-    setTeamScores(updatedScores);
-  };
-
-  const resetAllScores = () => {
-    setTeamScores({});
+  const removePlayer = (playerId) => {
+    setPlayers(players.filter(player => player.id !== playerId));
   };
 
   return (
-    <div className="scoreboard max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Scoreboard</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Leaderboard</h1>
       
       {/* Player Addition Section */}
-      <div className="player-input flex mb-6">
+      <div className="mb-6 flex">
         <input 
           type="text"
           value={newPlayerName}
@@ -106,48 +157,77 @@ const Scoreboard = () => {
         </button>
       </div>
 
-      {/* Player List */}
-      <div className="players-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {players.map(player => (
-          <div key={player.id} className="player-wrapper relative">
-            <Player 
-              name={player.name} 
-              onScoreChange={handlePlayerScoreChange}
-            />
-            <button 
-              onClick={() => removePlayer(player.name)}
-              className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Team Scores Summary */}
-      {players.length > 0 && (
-        <div className="team-scores mt-6 bg-gray-50 p-4 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4">Team Scores</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {Object.entries(teamScores).map(([name, score]) => (
-              <div 
-                key={name} 
-                className="score-summary bg-white p-2 rounded shadow"
+      {/* Sorted Player List with Score Controls */}
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-blue-500 text-white">
+            <tr>
+              <th className="py-3 px-4 text-left">Rank</th>
+              <th className="py-3 px-4 text-left">Name</th>
+              <th className="py-3 px-4 text-right">Score</th>
+              <th className="py-3 px-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedPlayers.map((player, index) => (
+              <tr 
+                key={player.id} 
+                className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-blue-50`}
               >
-                <span className="font-semibold">{name}:</span> {score}
-              </div>
+                <td className="py-3 px-4">{index + 1}</td>
+                <td className="py-3 px-4">{player.name}</td>
+                <td className="py-3 px-4 text-right">{player.score}</td>
+                <td className="py-3 px-4 text-center">
+                  <div className="flex justify-center space-x-2">
+                    <button 
+                      onClick={() => updatePlayerScore(player.id, 1)}
+                      className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      +1
+                    </button>
+                    <button 
+                      onClick={() => updatePlayerScore(player.id, -1)}
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      -1
+                    </button>
+                    <button 
+                      onClick={() => removePlayer(player.id)}
+                      className="bg-gray-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
-          </div>
-          <button 
-            onClick={resetAllScores}
-            className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-          >
-            Reset All Scores
-          </button>
-        </div>
-      )}
+          </tbody>
+        </table>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Scoreboard;
+function App() {
+  return (
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <Header username="<showuser>" />
+        
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/challenges" element={<ChallengesPage />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+        
+        <Footer />
+      </div>
+    </Router>
+  )
+}
+
+export default App
