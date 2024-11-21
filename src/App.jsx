@@ -7,35 +7,66 @@ import awsLogo from './assets/aws-logo.png'
 import wsLogo from './assets/ws-logo.png'
 
 const Header = ({ username }) => {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   return (
-    <div className="bg-blue-600 text-white">
+    <header className="bg-blue-600 text-white">
       <div className="container mx-auto px-4 flex justify-between items-center py-4">
         {/* Left Side - Logos and Navigation */}
         <div className="flex items-center space-x-6">
-          <img src={awsLogo} alt="AWS Logo" className="h-10 w-20 object-contain" />
-          <img src={wsLogo} alt="WorldSkills Logo" className="h-10 w-20 object-contain" />
+          {/* Logos */}
+          <div className="flex items-center space-x-4">
+            <img 
+              src={wsLogo} 
+              alt="WorldSkills Logo" 
+              className="h-10 w-20 object-contain" 
+            />
+            <img 
+              src={awsLogo} 
+              alt="AWS Logo" 
+              className="h-10 w-20 object-contain" 
+            />
+          </div>
+
+          {/* Navigation */}
           <nav className="flex items-center space-x-4">
-            <Link to="/" className="hover:underline">Home</Link>
             <Link to="/dashboard" className="hover:underline">Dashboard</Link>
-            <Link to="/leaderboard" className="hover:underline">Leaderboard</Link>
             <Link to="/challenges" className="hover:underline">Challenges</Link>
+            <Link to="/leaderboard" className="hover:underline">Leaderboard</Link>
           </nav>
         </div>
 
-        {/* Right Side - User Info */}
+        {/* Right Side - User Info and Login/Logout */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{username || '<showuser>'}</span>
-          </div>
-          <button className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
-            Login
-          </button>
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-4">
+              <span>Welcome, {username}</span>
+              <button 
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={handleLogin}
+              className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded"
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
-    </div>
+    </header>
   )
 }
 
